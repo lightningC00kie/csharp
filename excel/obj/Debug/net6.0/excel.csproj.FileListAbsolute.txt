@@ -1,0 +1,15 @@
+C:\Users\Kareem\Documents\sem3\c#\excel\obj\Debug\net6.0\excel.csproj.AssemblyReference.cache
+C:\Users\Kareem\Documents\sem3\c#\excel\obj\Debug\net6.0\excel.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Kareem\Documents\sem3\c#\excel\obj\Debug\net6.0\excel.AssemblyInfoInputs.cache
+C:\Users\Kareem\Documents\sem3\c#\excel\obj\Debug\net6.0\excel.AssemblyInfo.cs
+C:\Users\Kareem\Documents\sem3\c#\excel\obj\Debug\net6.0\excel.csproj.CoreCompileInputs.cache
+C:\Users\Kareem\Documents\sem3\c#\excel\bin\Debug\net6.0\excel.exe
+C:\Users\Kareem\Documents\sem3\c#\excel\bin\Debug\net6.0\excel.deps.json
+C:\Users\Kareem\Documents\sem3\c#\excel\bin\Debug\net6.0\excel.runtimeconfig.json
+C:\Users\Kareem\Documents\sem3\c#\excel\bin\Debug\net6.0\excel.dll
+C:\Users\Kareem\Documents\sem3\c#\excel\bin\Debug\net6.0\excel.pdb
+C:\Users\Kareem\Documents\sem3\c#\excel\obj\Debug\net6.0\excel.dll
+C:\Users\Kareem\Documents\sem3\c#\excel\obj\Debug\net6.0\refint\excel.dll
+C:\Users\Kareem\Documents\sem3\c#\excel\obj\Debug\net6.0\excel.pdb
+C:\Users\Kareem\Documents\sem3\c#\excel\obj\Debug\net6.0\excel.genruntimeconfig.cache
+C:\Users\Kareem\Documents\sem3\c#\excel\obj\Debug\net6.0\ref\excel.dll

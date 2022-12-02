@@ -1,0 +1,15 @@
+C:\Users\Kareem\Documents\sem3\c#\m_text_justify\bin\Debug\net6.0\m_text_justify.exe
+C:\Users\Kareem\Documents\sem3\c#\m_text_justify\bin\Debug\net6.0\m_text_justify.deps.json
+C:\Users\Kareem\Documents\sem3\c#\m_text_justify\bin\Debug\net6.0\m_text_justify.runtimeconfig.json
+C:\Users\Kareem\Documents\sem3\c#\m_text_justify\bin\Debug\net6.0\m_text_justify.dll
+C:\Users\Kareem\Documents\sem3\c#\m_text_justify\bin\Debug\net6.0\m_text_justify.pdb
+C:\Users\Kareem\Documents\sem3\c#\m_text_justify\obj\Debug\net6.0\m_text_justify.csproj.AssemblyReference.cache
+C:\Users\Kareem\Documents\sem3\c#\m_text_justify\obj\Debug\net6.0\m_text_justify.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Kareem\Documents\sem3\c#\m_text_justify\obj\Debug\net6.0\m_text_justify.AssemblyInfoInputs.cache
+C:\Users\Kareem\Documents\sem3\c#\m_text_justify\obj\Debug\net6.0\m_text_justify.AssemblyInfo.cs
+C:\Users\Kareem\Documents\sem3\c#\m_text_justify\obj\Debug\net6.0\m_text_justify.csproj.CoreCompileInputs.cache
+C:\Users\Kareem\Documents\sem3\c#\m_text_justify\obj\Debug\net6.0\m_text_justify.dll
+C:\Users\Kareem\Documents\sem3\c#\m_text_justify\obj\Debug\net6.0\refint\m_text_justify.dll
+C:\Users\Kareem\Documents\sem3\c#\m_text_justify\obj\Debug\net6.0\m_text_justify.pdb
+C:\Users\Kareem\Documents\sem3\c#\m_text_justify\obj\Debug\net6.0\m_text_justify.genruntimeconfig.cache
+C:\Users\Kareem\Documents\sem3\c#\m_text_justify\obj\Debug\net6.0\ref\m_text_justify.dll

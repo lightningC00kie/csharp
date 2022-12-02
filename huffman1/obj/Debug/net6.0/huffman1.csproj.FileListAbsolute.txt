@@ -1,0 +1,15 @@
+C:\Users\Kareem\Documents\sem3\c#\huffman1\obj\Debug\net6.0\huffman1.csproj.AssemblyReference.cache
+C:\Users\Kareem\Documents\sem3\c#\huffman1\obj\Debug\net6.0\huffman1.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Kareem\Documents\sem3\c#\huffman1\obj\Debug\net6.0\huffman1.AssemblyInfoInputs.cache
+C:\Users\Kareem\Documents\sem3\c#\huffman1\obj\Debug\net6.0\huffman1.AssemblyInfo.cs
+C:\Users\Kareem\Documents\sem3\c#\huffman1\obj\Debug\net6.0\huffman1.csproj.CoreCompileInputs.cache
+C:\Users\Kareem\Documents\sem3\c#\huffman1\bin\Debug\net6.0\huffman1.exe
+C:\Users\Kareem\Documents\sem3\c#\huffman1\bin\Debug\net6.0\huffman1.deps.json
+C:\Users\Kareem\Documents\sem3\c#\huffman1\bin\Debug\net6.0\huffman1.runtimeconfig.json
+C:\Users\Kareem\Documents\sem3\c#\huffman1\bin\Debug\net6.0\huffman1.dll
+C:\Users\Kareem\Documents\sem3\c#\huffman1\bin\Debug\net6.0\huffman1.pdb
+C:\Users\Kareem\Documents\sem3\c#\huffman1\obj\Debug\net6.0\huffman1.dll
+C:\Users\Kareem\Documents\sem3\c#\huffman1\obj\Debug\net6.0\refint\huffman1.dll
+C:\Users\Kareem\Documents\sem3\c#\huffman1\obj\Debug\net6.0\huffman1.pdb
+C:\Users\Kareem\Documents\sem3\c#\huffman1\obj\Debug\net6.0\huffman1.genruntimeconfig.cache
+C:\Users\Kareem\Documents\sem3\c#\huffman1\obj\Debug\net6.0\ref\huffman1.dll
