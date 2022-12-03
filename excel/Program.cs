@@ -38,29 +38,11 @@ class Top
             sheet.entries.Add(newRow);
         }
 
-        // Row r1 = new Row(1, 10);
-        // Entry e1 = new Entry("10", r1, 1);
-        // Entry e2 = new Entry("10", r1, 2);
-        // foreach (string e in Formula.ExtractOperands("=A1+B2", "+"))
-        // {
-        //     WriteLine(e);
-        // }
-        // Formula f = new Formula("*", new string[] { "B1", "A2" });
-        // WriteLine(f.operands[0]);
-        // WriteLine(f.operands[1]);
-        // WriteLine(f.op);
-        // WriteLine(sheet.EvaluateFormula(f));
-        // WriteLine(sheet.GetEntry("A2"));
-        // WriteLine(sheet.GetEntry("A1"));
-        WriteLine(sheet.EvaluateCell(sheet.GetEntry("B5")));
-        // WriteLine(sheet.entries.Count);
-        // WriteLine(sheet.entries[2].Count);
-        // WriteLine(sheet.entries[1][0]);
-        // foreach (List<Entry> l in sheet.entries) {
-        //     foreach(Entry e in l) {
-        //         WriteLine(sheet.EvaluateCell(e));
-        //     }
-        // }
+        foreach (List<Entry> l in sheet.entries) {
+            foreach(Entry e in l) {
+                WriteLine(sheet.EvaluateCell(e));
+            }
+        }
 
     }
 }
@@ -157,7 +139,7 @@ class Sheet
         return f;
     }
 
-    public string EvaluateFormula(Formula formula)
+    public string EvaluateFormula(Formula formula, Entry calledFrom)
     {
         // WriteLine($"{formula.operands[0]} {formula.op} {formula.operands[1]}");
         string row1; string col1;
@@ -169,12 +151,15 @@ class Sheet
                 oper1 = 0;
             }
             else {
-                string temp = EvaluateCell(GetEntry(formula.operands[0]));
-                if (temp == "[]") {
+                Entry temp = GetEntry(formula.operands[0]);
+                if (temp.Equals(calledFrom)) {
+                    return "#CYCLE";
+                }
+                if (EvaluateCell(temp) == "[]") {
                     oper1 = 0;
                 }
-                else if (int.TryParse(temp, out _)) {
-                    oper1 = int.Parse(temp);
+                else if (int.TryParse(EvaluateCell(temp), out _)) {
+                    oper1 = int.Parse(EvaluateCell(temp));
                 }
                 else {
                     return "#ERROR";
@@ -189,12 +174,15 @@ class Sheet
                 oper2 = 0;
             }
             else {
-                string temp = EvaluateCell(GetEntry(formula.operands[1]));
-                if (temp == "[]") {
+                Entry temp = GetEntry(formula.operands[1]);
+                if (temp.Equals(calledFrom)) {
+                    return "#CYCLE";
+                }
+                if (EvaluateCell(temp) == "[]") {
                     oper2 = 0;
                 }
-                else if (int.TryParse(temp, out _)) {
-                    oper2 = int.Parse(temp);
+                else if (int.TryParse(EvaluateCell(temp), out _)) {
+                    oper2 = int.Parse(EvaluateCell(temp));
                 }
                 else {
                     return "#ERROR";
@@ -247,7 +235,7 @@ class Sheet
             }
             // EvaluateCell(GetEntry(f.operands[0]));
             // EvaluateCell(GetEntry(f.operands[1]));
-            return EvaluateFormula(f);
+            return EvaluateFormula(f, e);
         }
     }
 }
