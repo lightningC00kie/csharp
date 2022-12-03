@@ -1,8 +1,10 @@
 ﻿using static System.Console;
-
+using System;
+using System.IO;
+using System.Collections.Generic;
 class Top
 {
-    public static void Main(String[] args)
+    public static void Main(string[] args)
     {
         if (args.Length != 2)
         {
@@ -29,27 +31,36 @@ class Top
             var newRow = new List<Entry>();
             Row r = new Row(rowCounter++, rowArray.Length);
             int colCounter = 1;
-            foreach (String s in rowArray)
+            foreach (string s in rowArray)
             {
                 Entry e = new Entry(s, r, colCounter++);
                 newRow.Add(e);
             }
-            // WriteLine(newRow.Count);
             sheet.entries.Add(newRow);
         }
 
-        foreach (List<Entry> l in sheet.entries) {
-            foreach(Entry e in l) {
-                WriteLine(sheet.EvaluateCell(e));
-            }
-        }
+        // WriteLine(sheet.EvaluateCell(sheet.GetEntry("B2")));
+        Formula f = sheet.ParseFormula(sheet.GetEntry("B2"))!;
+        // WriteLine(f.operands[0]);
+        // WriteLine(sheet.GetEntry(f.operands[0]).Equals(sheet.GetEntry("B2")));
+        WriteLine(sheet.EvaluateFormulaHelper(f, f.operands[0], sheet.GetEntry("B2")));
+        // int i = 0; int j = 0;
+        // foreach (List<Entry> l in sheet.entries) {
+        //     foreach(Entry e in l) {
+        //         sheet.entries[i][j++].content = sheet.EvaluateCell(e);
+        //     }
+        //     i++;
+        //     j = 0;
+        // }
 
+        // OutputWriter ow = new OutputWriter($"./{outputFile}");
+        // ow.WriteOutput(sheet);
     }
 }
 
 class InputReader
 {
-    public static StreamReader? OpenStreamReader(String inputFile)
+    public static StreamReader? OpenStreamReader(string inputFile)
     {
         StreamReader sr;
         try
@@ -76,6 +87,31 @@ class InputReader
     }
 }
 
+class OutputWriter {
+    StreamWriter sw;
+    public OutputWriter(string fileName) {
+        this.sw = new StreamWriter(fileName);
+    }
+
+    public void WriteOutput(Sheet s) {
+        using (sw) {
+            int i = 0;
+            foreach (List<Entry> l in s.entries) {
+                foreach (Entry e in l) {
+                    if (e.col == s.entries[i].Count) {
+                        sw.Write(e.content + '\n');
+                    }
+                    else {
+                        sw.Write(e.content + ' ');
+                    }
+                }
+                i++;
+            }
+        }
+        
+    }
+}
+
 class Sheet
 {
     public List<List<Entry>> entries = new List<List<Entry>>();
@@ -93,7 +129,6 @@ class Sheet
     {
         int colNum = ResolveColName(colName);
         int rowNum = int.Parse(rowName) - 1;
-        // WriteLine($"row: {rowNum}, column: {colNum}");
         if (rowNum < entries.Count && rowNum >= 0)
         {
             if (colNum < entries[rowNum].Count && colNum >= 0)
@@ -122,8 +157,6 @@ class Sheet
                 rowName += c;
             }
         }
-        // WriteLine(int.Parse(rowName));
-        // WriteLine(ResolveColName(colName));
         return entries[int.Parse(rowName) - 1][ResolveColName(colName)];
     }
 
@@ -138,59 +171,47 @@ class Sheet
 
         return f;
     }
+    // TODO: remove public
+    public string EvaluateFormulaHelper(Formula f, string operand, Entry calledFrom) {
+        string row; string col;
+        if (f.CheckNameFormat(operand, out col, out row)) {
+            if (!EntryExists(col, row)) {
+                return "0";
+            }
+            else {
+                Entry temp = GetEntry(operand);
+                if (temp.Equals(calledFrom)) {
+                    return "#CYCLE";
+                }
+                string value = EvaluateCell(temp);
+                if (value == "[]") {
+                    return "0";
+                }
+                else if (int.TryParse(value, out _)) {
+                    return value;
+                }
+                else {
+                    return "#ERROR";
+                }
+            }
+        }
+        else {
+            return "#FORMULA";
+        }
+    }
 
     public string EvaluateFormula(Formula formula, Entry calledFrom)
     {
-        // WriteLine($"{formula.operands[0]} {formula.op} {formula.operands[1]}");
-        string row1; string col1;
-        string row2; string col2;
-        int oper1; int oper2;
         int res;
-        if (formula.CheckNameFormat(formula.operands[0], out col1, out row1)) {
-            if (!EntryExists(col1, row1)) {
-                oper1 = 0;
-            }
-            else {
-                Entry temp = GetEntry(formula.operands[0]);
-                if (temp.Equals(calledFrom)) {
-                    return "#CYCLE";
-                }
-                if (EvaluateCell(temp) == "[]") {
-                    oper1 = 0;
-                }
-                else if (int.TryParse(EvaluateCell(temp), out _)) {
-                    oper1 = int.Parse(EvaluateCell(temp));
-                }
-                else {
-                    return "#ERROR";
-                }
-            }
+        string strOper1 = EvaluateFormulaHelper(formula, formula.operands[0], calledFrom);
+        string strOper2 = EvaluateFormulaHelper(formula, formula.operands[1], calledFrom);
+        int oper1; int oper2;
+
+        if (!int.TryParse(strOper1, out oper1)) {
+            return strOper1;
         }
-        else {
-            return "#FORMULA";
-        }
-        if (formula.CheckNameFormat(formula.operands[1], out col2, out row2)) {
-            if (!EntryExists(col2, row2)) {
-                oper2 = 0;
-            }
-            else {
-                Entry temp = GetEntry(formula.operands[1]);
-                if (temp.Equals(calledFrom)) {
-                    return "#CYCLE";
-                }
-                if (EvaluateCell(temp) == "[]") {
-                    oper2 = 0;
-                }
-                else if (int.TryParse(EvaluateCell(temp), out _)) {
-                    oper2 = int.Parse(EvaluateCell(temp));
-                }
-                else {
-                    return "#ERROR";
-                }
-            }
-        }
-        else {
-            return "#FORMULA";
+        if (!int.TryParse(strOper2, out oper2)) {
+            return strOper2;
         }
     
         if (formula.op == "+")
@@ -219,7 +240,6 @@ class Sheet
     {
         if (!e.IsFormula())
         {
-            // WriteLine(e);
             if (int.TryParse(e.content, out _) || e.content == "[]") {
                 return e.content;
             }
@@ -233,8 +253,6 @@ class Sheet
             if (f == null) {
                 return "#MISSOP";
             }
-            // EvaluateCell(GetEntry(f.operands[0]));
-            // EvaluateCell(GetEntry(f.operands[1]));
             return EvaluateFormula(f, e);
         }
     }
@@ -327,8 +345,8 @@ class Formula : Sheet
 class Entry : Sheet
 {
     public string content;
-    Row row;
-    int col;
+    public Row row;
+    public int col;
     override public string ToString()
     {
         return $"{this.content}, row: {this.row.rowNum}, col: {this.col}, row length: {this.row.rowLen}";
