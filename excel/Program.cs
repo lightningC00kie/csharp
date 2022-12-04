@@ -49,7 +49,6 @@ class Top
                 if (content != "") {
                     Entry e = new Entry(content, sheet.entries.Count, colCounter++);
                     sheet.entries[sheet.entries.Count - 1].Add(e);
-                    // colCounter++;
                     content = "";
                 }
             }
@@ -58,6 +57,10 @@ class Top
         if (content != "") {
             Entry e = new Entry(content, sheet.entries.Count, colCounter++);
             sheet.entries[sheet.entries.Count - 1].Add(e);
+        }
+
+        if (sheet.entries.Count == 1 && sheet.entries[0].Count == 0) {
+            return;
         }
 
         StreamWriter sw = new StreamWriter($"./{outputFile}");
@@ -113,40 +116,35 @@ class InputReader
         return c;
     }
 
-    public static string[] SplitRow(string row)
-    {
-        return row.Split(" ");
-    }
-
     public static bool IsWhiteSpace(char c) {
         return c == ' ' || c == '\n' || c == '\t' || c == '\r';
     }
 }
 
-class OutputWriter {
-    StreamWriter sw;
-    public OutputWriter(string fileName) {
-        this.sw = new StreamWriter(fileName);
-    }
+// class OutputWriter {
+//     StreamWriter sw;
+//     public OutputWriter(string fileName) {
+//         this.sw = new StreamWriter(fileName);
+//     }
 
-    public void WriteOutput(Sheet s) {
-        using (sw) {
-            int i = 0;
-            foreach (List<Entry> l in s.entries) {
-                foreach (Entry e in l) {
-                    if (e.col == s.entries[i].Count) {
-                        sw.Write(e.content + '\n');
-                    }
-                    else {
-                        sw.Write(e.content + ' ');
-                    }
-                }
-                i++;
-            }
-        }
+//     public void WriteOutput(Sheet s) {
+//         using (sw) {
+//             int i = 0;
+//             foreach (List<Entry> l in s.entries) {
+//                 foreach (Entry e in l) {
+//                     if (e.col == s.entries[i].Count) {
+//                         sw.Write(e.content + '\n');
+//                     }
+//                     else {
+//                         sw.Write(e.content + ' ');
+//                     }
+//                 }
+//                 i++;
+//             }
+//         }
         
-    }
-}
+//     }
+// }
 
 class Sheet
 {
@@ -177,22 +175,9 @@ class Sheet
 
     public Entry GetEntry(string name)
     {
-        bool colPart = true;
         string colName = "";
         string rowName = "";
-        foreach (char c in name)
-        {
-            if (c >= 'A' && c <= 'Z')
-            {
-                if (colPart)
-                    colName += c;
-            }
-            else if (int.TryParse(c.ToString(), out _))
-            {
-                colPart = false;
-                rowName += c;
-            }
-        }
+        CheckNameFormat(name, out colName, out rowName);
         return entries[int.Parse(rowName) - 1][ResolveColName(colName)];
     }
 
@@ -208,20 +193,18 @@ class Sheet
         return f;
     }
 
-    string EvaluateFormulaHelper(Formula f, string operand) {
+    string EvaluateFormulaHelper(Entry e, Formula f, string operand) {
         string row; string col;
-        if (f.CheckNameFormat(operand, out col, out row)) {
+        if (CheckNameFormat(operand, out col, out row)) {
             if (!EntryExists(col, row)) {
                 return "0";
             }
             else {
-                Entry temp = GetEntry(operand);
-                if (temp.IsFormula()) {
-                    Formula? f2 = ParseFormula(temp);
-                    if (f2 != null && IsCycle(f, f2)) {
-                        return "#CYCLE";
-                    }
+                if (IsCycle(e, f, row, col)) {
+                    return "#CYCLE";
                 }
+                
+                Entry temp = GetEntry(operand);
                 string value = EvaluateCell(temp);
                 if (value == "[]") {
                     return "0";
@@ -239,23 +222,43 @@ class Sheet
         }
     }
 
-    bool IsCycle(Formula f1, Formula f2) {
-        if (f1.operands[0] == f2.operands[0] || f1.operands[0] == f2.operands[1] || f1.operands[1] == f2.operands[0] || f1.operands[1] == f2.operands[1]) {
-            return true;
+    bool IsCycle(Entry e, Formula f, string row, string col) {
+        Entry operEntry = entries[int.Parse(row)-1][ResolveColName(col)];
+        if (operEntry.IsFormula()) {
+            Formula? f2 = ParseFormula(operEntry);
+            if (f2 != null) {
+                if (!CheckNameFormat(f2.operands[0], out col, out row)) {
+                    return false;
+                }
+                if (!EntryExists(col, row)) {
+                    return false;
+                }
+                if (!CheckNameFormat(f2.operands[1], out col, out row)) {
+                    return false;
+                }
+                if (!EntryExists(col, row)) {
+                    return false;
+                }
+
+                if (GetEntry(f2.operands[0]).Equals(e) || GetEntry(f2.operands[1]).Equals(e)) {
+                    return true;
+                }
+            }
         }
         return false;
     }
 
-    public string EvaluateFormula(Formula formula)
+    public string EvaluateFormula(Entry e, Formula formula)
     {
         int res;
-        string strOper1 = EvaluateFormulaHelper(formula, formula.operands[0]);
-        string strOper2 = EvaluateFormulaHelper(formula, formula.operands[1]);
         int oper1; int oper2;
 
+        string strOper1 = EvaluateFormulaHelper(e, formula, formula.operands[0]);
         if (!int.TryParse(strOper1, out oper1)) {
             return strOper1;
         }
+
+        string strOper2 = EvaluateFormulaHelper(e, formula, formula.operands[1]);
         if (!int.TryParse(strOper2, out oper2)) {
             return strOper2;
         }
@@ -299,47 +302,11 @@ class Sheet
             if (f == null) {
                 return "#MISSOP";
             }
-            return EvaluateFormula(f);
+            return EvaluateFormula(e, f);
         }
     }
-}
 
-class Formula : Sheet
-{
-    public string? op { get; set; }
-    public string[] operands = new string[2];
-
-    public Formula(string op, string[] operands)
-    {
-        this.op = op; this.operands = operands;
-    }
-    public static string? ExtractOp(string formula)
-    {
-        string op = "";
-        if (formula.Contains('+'))
-        {
-            op = "+";
-        }
-        else if (formula.Contains('-'))
-        {
-            op = "-";
-        }
-        else if (formula.Contains('*'))
-        {
-            op = "*";
-        }
-        else if (formula.Contains('/'))
-        {
-            op = "/";
-        }
-        else
-        {
-            return null;
-        }
-        return op;
-    }
-
-    public bool CheckNameFormat(string name, out string colName, out string rowName)
+    public static bool CheckNameFormat(string name, out string colName, out string rowName)
     {
         colName = "";
         rowName = "";
@@ -380,6 +347,42 @@ class Formula : Sheet
         }
         return true;
     }
+}
+
+class Formula : Sheet
+{
+    public string? op { get; set; }
+    public string[] operands = new string[2];
+
+    public Formula(string op, string[] operands)
+    {
+        this.op = op; this.operands = operands;
+    }
+    public static string? ExtractOp(string formula)
+    {
+        string op = "";
+        if (formula.Contains('+'))
+        {
+            op = "+";
+        }
+        else if (formula.Contains('-'))
+        {
+            op = "-";
+        }
+        else if (formula.Contains('*'))
+        {
+            op = "*";
+        }
+        else if (formula.Contains('/'))
+        {
+            op = "/";
+        }
+        else
+        {
+            return null;
+        }
+        return op;
+    }
 
     public static string[] ExtractOperands(string formula, string op)
     {
@@ -393,11 +396,6 @@ class Entry : Sheet
     public string content;
     public int col;
     public int row;
-
-    // override public string ToString()
-    // {
-    //     return $"{this.content}, row: {this.row}, col: {this.col}";
-    // }
     public Entry(string content, int row, int col)
     {
         this.content = content; this.row = row; this.col = col;
@@ -405,6 +403,6 @@ class Entry : Sheet
 
     public bool IsFormula()
     {
-        return this.content[0] == '=' && this.content.Length > 1;
+        return this.content.Length >= 1 && this.content[0] == '=';
     }
 }
