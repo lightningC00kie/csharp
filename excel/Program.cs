@@ -23,38 +23,67 @@ class Top
         }
 
         Sheet sheet = new Sheet();
-        string? row;
+        InputReader ir = new InputReader(inputFile);
+
+        if (ir.sr == null) {
+            return;
+        }
+
         int rowCounter = 1;
-        while ((row = InputReader.ReadRow(sr)) != null)
-        {
-            string[] rowArray = InputReader.SplitRow(row);
-            var newRow = new List<Entry>();
-            Row r = new Row(rowCounter++, rowArray.Length);
-            int colCounter = 1;
-            foreach (string s in rowArray)
-            {
-                Entry e = new Entry(s, r, colCounter++);
-                newRow.Add(e);
+        int colCounter = 1;
+        int intChar;
+        string content = "";
+        Row r = new Row(rowCounter, sheet.entries[rowCounter].Count);
+        while((intChar = ir.ReadChar()) != -1) {
+            char c = (char) intChar;
+            if (!InputReader.IsWhiteSpace(c)) {
+                content += c;
             }
-            sheet.entries.Add(newRow);
-        }
-
-        int i = 0; int j = 0;
-        foreach (List<Entry> l in sheet.entries) {
-            foreach(Entry e in l) {
-                sheet.entries[i][j++].content = sheet.EvaluateCell(e);
+            else if (c == '\n') { // starting a new row
+                rowCounter++;
             }
-            i++;
-            j = 0;
+            else { // adding new entry to row
+                Entry e = new Entry(content, r, colCounter++);
+                sheet.entries[rowCounter].Add(e);
+                content = "";
+            }
         }
+        // string? row;
+        // int rowCounter = 1;
+        // while ((row = InputReader.ReadRow(sr)) != null)
+        // {
+        //     string[] rowArray = InputReader.SplitRow(row);
+        //     var newRow = new List<Entry>();
+        //     Row r = new Row(rowCounter++, rowArray.Length);
+        //     int colCounter = 1;
+        //     foreach (string s in rowArray)
+        //     {
+        //         if (s == " ") {
+        //             continue;
+        //         }
+        //         Entry e = new Entry(s, r, colCounter++);
+        //         newRow.Add(e);
+        //     }
+        //     sheet.entries.Add(newRow);
+        // }
 
-        OutputWriter ow = new OutputWriter($"./{outputFile}");
-        ow.WriteOutput(sheet);
+        // int i = 0; int j = 0;
+        // foreach (List<Entry> l in sheet.entries) {
+        //     foreach(Entry e in l) {
+        //         sheet.entries[i][j++].content = sheet.EvaluateCell(e);
+        //     }
+        //     i++;
+        //     j = 0;
+        // }
+
+        // OutputWriter ow = new OutputWriter($"./{outputFile}");
+        // ow.WriteOutput(sheet);
     }
 }
 
 class InputReader
 {
+    public StreamReader? sr;
     public static StreamReader? OpenStreamReader(string inputFile)
     {
         StreamReader sr;
@@ -70,15 +99,29 @@ class InputReader
         return sr;
     }
 
-    public static string? ReadRow(StreamReader sr)
+    public InputReader(string fileName) {
+        try {
+            this.sr = new StreamReader($"./{fileName}");
+        }
+        catch {
+            WriteLine("File Error");
+            return;
+        }
+    }
+
+    public int ReadChar()
     {
-        var row = sr.ReadLine();
-        return row == null ? row : row.TrimEnd();
+        int c = sr!.Read();
+        return c;
     }
 
     public static string[] SplitRow(string row)
     {
-        return row.Split(null);
+        return row.Split(" ");
+    }
+
+    public static bool IsWhiteSpace(char c) {
+        return c == ' ' || c == '\n' || c == '\t' || c == '\r';
     }
 }
 
@@ -317,7 +360,7 @@ class Formula : Sheet
                 {
                     if (counter != 0)
                     {
-                        if (c < '1' || c > '9')
+                        if (c < '0' || c > '9')
                         {
                             return false;
                         }
@@ -330,7 +373,7 @@ class Formula : Sheet
             }
             else
             {
-                if (c < '1' || c > '9')
+                if (c < '0' || c > '9')
                 {
                     return false;
                 }
