@@ -29,56 +29,53 @@ class Top
             return;
         }
 
-        int rowCounter = 1;
-        int colCounter = 1;
+        int colCounter = 0;
         int intChar;
         string content = "";
-        Row r = new Row(rowCounter, sheet.entries[rowCounter].Count);
+        sheet.entries.Add(new List<Entry>());
         while((intChar = ir.ReadChar()) != -1) {
             char c = (char) intChar;
             if (!InputReader.IsWhiteSpace(c)) {
                 content += c;
             }
             else if (c == '\n') { // starting a new row
-                rowCounter++;
+                Entry e = new Entry(content, sheet.entries.Count, colCounter++);
+                sheet.entries[sheet.entries.Count - 1].Add(e);
+                sheet.entries.Add(new List<Entry>());
+                content = "";
+                colCounter = 0;
             }
             else { // adding new entry to row
-                Entry e = new Entry(content, r, colCounter++);
-                sheet.entries[rowCounter].Add(e);
-                content = "";
+                if (content != "") {
+                    Entry e = new Entry(content, sheet.entries.Count, colCounter++);
+                    sheet.entries[sheet.entries.Count - 1].Add(e);
+                    // colCounter++;
+                    content = "";
+                }
             }
         }
 
+        if (content != "") {
+            Entry e = new Entry(content, sheet.entries.Count, colCounter++);
+            sheet.entries[sheet.entries.Count - 1].Add(e);
+        }
 
-        WriteLine("norow");
-        // while ((row = InputReader.ReadRow(sr)) != null)
-        // {
-        //     string[] rowArray = InputReader.SplitRow(row);
-        //     var newRow = new List<Entry>();
-        //     Row r = new Row(rowCounter++, rowArray.Length);
-        //     int colCounter = 1;
-        //     foreach (string s in rowArray)
-        //     {
-        //         if (s == " ") {
-        //             continue;
-        //         }
-        //         Entry e = new Entry(s, r, colCounter++);
-        //         newRow.Add(e);
-        //     }
-        //     sheet.entries.Add(newRow);
-        // }
-
-        // int i = 0; int j = 0;
-        // foreach (List<Entry> l in sheet.entries) {
-        //     foreach(Entry e in l) {
-        //         sheet.entries[i][j++].content = sheet.EvaluateCell(e);
-        //     }
-        //     i++;
-        //     j = 0;
-        // }
-
-        // OutputWriter ow = new OutputWriter($"./{outputFile}");
-        // ow.WriteOutput(sheet);
+        StreamWriter sw = new StreamWriter($"./{outputFile}");
+        int i = 0;
+        using (sw) {
+            foreach (List<Entry> l in sheet.entries) {
+                foreach(Entry e in l) {
+                    if (e.col == sheet.entries[i].Count - 1) {
+                        sw.Write(sheet.EvaluateCell(e) + '\n');
+                    }
+                    else {
+                        sw.Write(sheet.EvaluateCell(e) + ' ');
+                    }
+                }
+                i++;
+            }
+        }
+        
     }
 }
 
@@ -394,13 +391,14 @@ class Formula : Sheet
 class Entry : Sheet
 {
     public string content;
-    public Row row;
     public int col;
-    override public string ToString()
-    {
-        return $"{this.content}, row: {this.row.rowNum}, col: {this.col}, row length: {this.row.rowLen}";
-    }
-    public Entry(string content, Row row, int col)
+    public int row;
+
+    // override public string ToString()
+    // {
+    //     return $"{this.content}, row: {this.row}, col: {this.col}";
+    // }
+    public Entry(string content, int row, int col)
     {
         this.content = content; this.row = row; this.col = col;
     }
@@ -408,15 +406,5 @@ class Entry : Sheet
     public bool IsFormula()
     {
         return this.content[0] == '=' && this.content.Length > 1;
-    }
-}
-
-class Row
-{
-    public int rowLen;
-    public int rowNum;
-    public Row(int rowNum, int rowLen)
-    {
-        this.rowNum = rowNum; this.rowLen = rowLen;
     }
 }
