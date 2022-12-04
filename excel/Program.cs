@@ -39,22 +39,17 @@ class Top
             sheet.entries.Add(newRow);
         }
 
-        // WriteLine(sheet.EvaluateCell(sheet.GetEntry("B2")));
-        Formula f = sheet.ParseFormula(sheet.GetEntry("B2"))!;
-        // WriteLine(f.operands[0]);
-        // WriteLine(sheet.GetEntry(f.operands[0]).Equals(sheet.GetEntry("B2")));
-        WriteLine(sheet.EvaluateFormulaHelper(f, f.operands[0], sheet.GetEntry("B2")));
-        // int i = 0; int j = 0;
-        // foreach (List<Entry> l in sheet.entries) {
-        //     foreach(Entry e in l) {
-        //         sheet.entries[i][j++].content = sheet.EvaluateCell(e);
-        //     }
-        //     i++;
-        //     j = 0;
-        // }
+        int i = 0; int j = 0;
+        foreach (List<Entry> l in sheet.entries) {
+            foreach(Entry e in l) {
+                sheet.entries[i][j++].content = sheet.EvaluateCell(e);
+            }
+            i++;
+            j = 0;
+        }
 
-        // OutputWriter ow = new OutputWriter($"./{outputFile}");
-        // ow.WriteOutput(sheet);
+        OutputWriter ow = new OutputWriter($"./{outputFile}");
+        ow.WriteOutput(sheet);
     }
 }
 
@@ -171,8 +166,8 @@ class Sheet
 
         return f;
     }
-    // TODO: remove public
-    public string EvaluateFormulaHelper(Formula f, string operand, Entry calledFrom) {
+
+    string EvaluateFormulaHelper(Formula f, string operand) {
         string row; string col;
         if (f.CheckNameFormat(operand, out col, out row)) {
             if (!EntryExists(col, row)) {
@@ -180,8 +175,11 @@ class Sheet
             }
             else {
                 Entry temp = GetEntry(operand);
-                if (temp.Equals(calledFrom)) {
-                    return "#CYCLE";
+                if (temp.IsFormula()) {
+                    Formula? f2 = ParseFormula(temp);
+                    if (f2 != null && IsCycle(f, f2)) {
+                        return "#CYCLE";
+                    }
                 }
                 string value = EvaluateCell(temp);
                 if (value == "[]") {
@@ -200,11 +198,18 @@ class Sheet
         }
     }
 
-    public string EvaluateFormula(Formula formula, Entry calledFrom)
+    bool IsCycle(Formula f1, Formula f2) {
+        if (f1.operands[0] == f2.operands[0] || f1.operands[0] == f2.operands[1] || f1.operands[1] == f2.operands[0] || f1.operands[1] == f2.operands[1]) {
+            return true;
+        }
+        return false;
+    }
+
+    public string EvaluateFormula(Formula formula)
     {
         int res;
-        string strOper1 = EvaluateFormulaHelper(formula, formula.operands[0], calledFrom);
-        string strOper2 = EvaluateFormulaHelper(formula, formula.operands[1], calledFrom);
+        string strOper1 = EvaluateFormulaHelper(formula, formula.operands[0]);
+        string strOper2 = EvaluateFormulaHelper(formula, formula.operands[1]);
         int oper1; int oper2;
 
         if (!int.TryParse(strOper1, out oper1)) {
@@ -253,7 +258,7 @@ class Sheet
             if (f == null) {
                 return "#MISSOP";
             }
-            return EvaluateFormula(f, e);
+            return EvaluateFormula(f);
         }
     }
 }
