@@ -2,6 +2,7 @@
 using System;
 using System.IO;
 using System.Collections.Generic;
+
 class Top
 {
     public static void Main(string[] args)
@@ -28,7 +29,7 @@ class Top
         if (ir.sr == null) {
             return;
         }
-
+                
         int colCounter = 0;
         int intChar;
         string content = "";
@@ -38,9 +39,11 @@ class Top
             if (!InputReader.IsWhiteSpace(c)) {
                 content += c;
             }
-            else if (c == '\n') { // starting a new row
-                Entry e = new Entry(content, sheet.entries.Count, colCounter++);
-                sheet.entries[sheet.entries.Count - 1].Add(e);
+            else if (c == '\n' || c == '\r') { // starting a new row
+                if (content != "") {
+                    Entry e = new Entry(content, sheet.entries.Count, colCounter++);
+                    sheet.entries[sheet.entries.Count - 1].Add(e);
+                }
                 sheet.entries.Add(new List<Entry>());
                 content = "";
                 colCounter = 0;
@@ -53,6 +56,7 @@ class Top
                 }
             }
         }
+
 
         if (content != "") {
             Entry e = new Entry(content, sheet.entries.Count, colCounter++);
@@ -78,7 +82,6 @@ class Top
                 i++;
             }
         }
-        
     }
 }
 
@@ -173,13 +176,12 @@ class Sheet
         return false;
     }
 
-    public Entry GetEntry(string name)
-    {
-        string colName = "";
-        string rowName = "";
-        CheckNameFormat(name, out colName, out rowName);
-        return entries[int.Parse(rowName) - 1][ResolveColName(colName)];
-    }
+    // public Entry GetEntry(string name)
+    // {
+    //     string colName = "";
+    //     string rowName = "";
+    //     return entries[int.Parse(rowName) - 1][ResolveColName(colName)];
+    // }
 
     public Formula? ParseFormula(Entry e)
     {
@@ -204,7 +206,7 @@ class Sheet
                     return "#CYCLE";
                 }
                 
-                Entry temp = GetEntry(operand);
+                Entry temp = entries[int.Parse(row) - 1][ResolveColName(col)];
                 string value = EvaluateCell(temp);
                 if (value == "[]") {
                     return "0";
@@ -226,24 +228,26 @@ class Sheet
         Entry operEntry = entries[int.Parse(row)-1][ResolveColName(col)];
         if (operEntry.IsFormula()) {
             Formula? f2 = ParseFormula(operEntry);
-            if (f2 != null) {
-                if (!CheckNameFormat(f2.operands[0], out col, out row)) {
-                    return false;
-                }
-                if (!EntryExists(col, row)) {
-                    return false;
-                }
-                if (!CheckNameFormat(f2.operands[1], out col, out row)) {
-                    return false;
-                }
-                if (!EntryExists(col, row)) {
-                    return false;
-                }
+            // if (f2 != null) {
+            //     string operRow; string operCol;
+            //     if (!CheckNameFormat(f2.operands[0], out operCol, out operRow)) {
+            //         return false;
+            //     }
 
-                if (GetEntry(f2.operands[0]).Equals(e) || GetEntry(f2.operands[1]).Equals(e)) {
-                    return true;
-                }
-            }
+            //     if (ResolveColName(operCol) == e.col && int.Parse(operRow) == e.row) {
+            //         return true;
+            //     }
+
+            //     if (!CheckNameFormat(f2.operands[1], out operCol, out operRow)) {
+            //         return false;
+            //     }
+
+            //     if (ResolveColName(operCol) == e.col && int.Parse(operRow) == e.row) {
+            //         return true;
+            //     }
+
+            // }
+            
         }
         return false;
     }
@@ -316,7 +320,7 @@ class Sheet
         {
             if (colPart)
             {
-                if ((int)c >= 65 && (int)c <= 90)
+                if (c >= 'A' && c <= 'Z')
                 {
                     colName += c;
                     counter++;
@@ -325,7 +329,7 @@ class Sheet
                 {
                     if (counter != 0)
                     {
-                        if (c < '0' || c > '9')
+                        if (c > '9' && c < '0')
                         {
                             return false;
                         }
@@ -338,7 +342,7 @@ class Sheet
             }
             else
             {
-                if (c < '0' || c > '9')
+                if (c > '9' && c < '0')
                 {
                     return false;
                 }
@@ -403,6 +407,6 @@ class Entry : Sheet
 
     public bool IsFormula()
     {
-        return this.content.Length >= 1 && this.content[0] == '=';
+        return this.content.Length >= 6 && this.content[0] == '=';
     }
 }
