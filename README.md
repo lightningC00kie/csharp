@@ -10,4 +10,8 @@ dripping with indulgent remedies
 unused variables litter the screen
 as dread stfiles ye fingers
 
+the scope elusive and strict
+unrelenting static errors
+thou exceptions
+
 ~ Kareem c. 2022
