@@ -1,0 +1,15 @@
+/home/bes/Documents/sem3/csharp/expr_eval/bin/Debug/net6.0/expr_eval
+/home/bes/Documents/sem3/csharp/expr_eval/bin/Debug/net6.0/expr_eval.deps.json
+/home/bes/Documents/sem3/csharp/expr_eval/bin/Debug/net6.0/expr_eval.runtimeconfig.json
+/home/bes/Documents/sem3/csharp/expr_eval/bin/Debug/net6.0/expr_eval.dll
+/home/bes/Documents/sem3/csharp/expr_eval/bin/Debug/net6.0/expr_eval.pdb
+/home/bes/Documents/sem3/csharp/expr_eval/obj/Debug/net6.0/expr_eval.csproj.AssemblyReference.cache
+/home/bes/Documents/sem3/csharp/expr_eval/obj/Debug/net6.0/expr_eval.GeneratedMSBuildEditorConfig.editorconfig
+/home/bes/Documents/sem3/csharp/expr_eval/obj/Debug/net6.0/expr_eval.AssemblyInfoInputs.cache
+/home/bes/Documents/sem3/csharp/expr_eval/obj/Debug/net6.0/expr_eval.AssemblyInfo.cs
+/home/bes/Documents/sem3/csharp/expr_eval/obj/Debug/net6.0/expr_eval.csproj.CoreCompileInputs.cache
+/home/bes/Documents/sem3/csharp/expr_eval/obj/Debug/net6.0/expr_eval.dll
+/home/bes/Documents/sem3/csharp/expr_eval/obj/Debug/net6.0/refint/expr_eval.dll
+/home/bes/Documents/sem3/csharp/expr_eval/obj/Debug/net6.0/expr_eval.pdb
+/home/bes/Documents/sem3/csharp/expr_eval/obj/Debug/net6.0/expr_eval.genruntimeconfig.cache
+/home/bes/Documents/sem3/csharp/expr_eval/obj/Debug/net6.0/ref/expr_eval.dll
