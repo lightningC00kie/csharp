@@ -1,0 +1,61 @@
+{
+  "format": 1,
+  "restore": {
+    "/home/bes/Documents/sem3/csharp/expr_eval/expr_eval.csproj": {}
+  },
+  "projects": {
+    "/home/bes/Documents/sem3/csharp/expr_eval/expr_eval.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "/home/bes/Documents/sem3/csharp/expr_eval/expr_eval.csproj",
+        "projectName": "expr_eval",
+        "projectPath": "/home/bes/Documents/sem3/csharp/expr_eval/expr_eval.csproj",
+        "packagesPath": "/home/bes/.nuget/packages/",
+        "outputPath": "/home/bes/Documents/sem3/csharp/expr_eval/obj/",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "/home/bes/.nuget/NuGet/NuGet.Config"
+        ],
+        "originalTargetFrameworks": [
+          "net6.0"
+        ],
+        "sources": {
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net6.0": {
+            "targetAlias": "net6.0",
+            "projectReferences": {}
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        }
+      },
+      "frameworks": {
+        "net6.0": {
+          "targetAlias": "net6.0",
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48",
+            "net481"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "/home/bes/.dotnet/sdk/6.0.403/RuntimeIdentifierGraph.json"
+        }
+      }
+    }
+  }
+}
