@@ -30,49 +30,35 @@ class Top
             return;
         }
 
-        // int intChar;
-        // string content = "";
-        // while((intChar = ir.ReadChar()) != -1) {
-        //     char c = (char) intChar;
-        //     if (!InputReader.IsWhiteSpace(c)) {
-        //         content += c;
-        //     }
-        //     else if (c == '\n') { // starting a new row
-        //         if (content != "") {
-        //             Entry e = new Entry(content, sheet.entries.Count, colCounter++);
-        //             sheet.entries[sheet.entries.Count - 1].Add(e);
-        //         }
-        //         sheet.entries.Add(new List<Entry>());
-        //         content = "";
-        //         colCounter = 0;
-        //     }
-        //     else { // adding new entry to row
-        //         if (content != "") {
-        //             Entry e = new Entry(content, sheet.entries.Count, colCounter++);
-        //             sheet.entries[sheet.entries.Count - 1].Add(e);
-        //             content = "";
-        //         }
-        //     }
-        // }
-        // if (content != "") {
-        //     Entry e = new Entry(content, sheet.entries.Count, colCounter++);
-        //     sheet.entries[sheet.entries.Count - 1].Add(e);
-        // }
-        int row = 0;
         int col = 0;
-        string? line;
-        while ((line = sr.ReadLine()) != null) {
-            if (line == "") {
-                continue;
+        int intChar;
+        string content = "";
+        sheet.entries.Add(new List<Entry>());
+        while((intChar = ir.ReadChar()) != -1) {
+            char c = (char) intChar;
+            if (!InputReader.IsWhiteSpace(c)) {
+                content += c;
             }
-            // WriteLine(line);
-            sheet.entries.Add(new List<Entry>());
-            foreach (string s in System.Text.RegularExpressions.Regex.Split(line, @"\s+")) {
-                WriteLine(s);
-                sheet.entries[row].Add(new Entry(s, row, col++));
+            else if (c == '\n') { // starting a new row
+                if (content != "") {
+                    Entry e = new Entry(content, sheet.entries.Count, col++);
+                    sheet.entries[sheet.entries.Count - 1].Add(e);
+                }
+                sheet.entries.Add(new List<Entry>());
+                content = "";
+                col = 0;
             }
-            col = 0;
-            row++;
+            else { // adding new entry to row
+                if (content != "") {
+                    Entry e = new Entry(content, sheet.entries.Count, col++);
+                    sheet.entries[sheet.entries.Count - 1].Add(e);
+                    content = "";
+                }
+            }
+        }
+        if (content != "") {
+            Entry e = new Entry(content, sheet.entries.Count, col++);
+            sheet.entries[sheet.entries.Count - 1].Add(e);
         }
 
         if (sheet.entries.Count == 1 && sheet.entries[0].Count == 0) {
@@ -134,16 +120,11 @@ class InputReader
     public static bool IsWhiteSpace(char c) {
         return c == ' ' || c == '\n' || c == '\t' || c == '\r';
     }
-
-    public static string[] SplitRow(string row) {
-        return System.Text.RegularExpressions.Regex.Split(row, @"\s+");
-    }
 }
 
 class Sheet
 {
     public List<List<Entry>> entries = new List<List<Entry>>();
-    List<Entry> cycles = new List<Entry>();
     public static int ResolveColName(string colName)
     {
         int counter = 0;
@@ -196,11 +177,11 @@ class Sheet
         }
         else
         {
-            if (cycles.Contains(e)) {
+            if (e.cycle && !e.evaluated) {
                 return "#CYCLE";
             } 
             else {
-                cycles.Add(e);
+                e.cycle = true;
             }
 
             string message;
@@ -237,11 +218,11 @@ class Sheet
                 f.operands[1].evaluated = true;
                 return res2;
             }
-            cycles = new List<Entry>();
             operand1 = operand1 == "[]" ? "0" : operand1;
             operand2 = operand2 == "[]" ? "0" : operand2;
             e.content = EvaluateFormula(int.Parse(operand1), int.Parse(operand2), f.op!);
             e.evaluated = true;
+            // e.cycle = false;
             return e.content;
         }
     }
@@ -395,6 +376,7 @@ class Entry : Sheet
     public int col;
     public int row;
     public bool evaluated = false;
+    public bool cycle = false;
     public Entry(string content, int row, int col)
     {
         this.content = content; this.row = row; this.col = col;
